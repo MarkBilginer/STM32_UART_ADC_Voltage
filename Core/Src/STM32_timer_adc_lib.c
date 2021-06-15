@@ -27,10 +27,33 @@ void tim_base_start_interrupt()
 	HAL_TIM_Base_Start_IT(&htim1);
 }
 
+unsigned int strlength(char *p)
+{
+	unsigned int count = 0;
+
+	while(*p!='\0')
+	{
+		count++;
+		p++;
+	}
+
+	return count;
+}
+
+/* Function to calculate x raised to the power y */
+int power(int x, unsigned int y)
+{
+	if (y == 0)
+		return 1;
+	else if (y%2 == 0)
+		return power(x, y/2)*power(x, y/2);
+	else
+		return x*power(x, y/2)*power(x, y/2);
+}
 
 void uart_print(char text[])
 {
-	HAL_UART_Transmit(&huart2, (uint8_t*) text, strlen(text), 100);
+	HAL_UART_Transmit(&huart2, (uint8_t*) text, strlength(text), 100);
 }
 
 
@@ -89,7 +112,7 @@ void ftoa(float n, char* res, int afterpoint)
 		// Get the value of fraction part upto given no.
 		// of points after dot. The third parameter
 		// is needed to handle cases like 233.007
-		fpart = fpart * pow(10, afterpoint);
+		fpart = fpart * power(10, afterpoint);
 
 		intToStr((int)fpart, res + i + 1, afterpoint);
 	}

@@ -27,6 +27,10 @@ void reverse(char* str, int len);
 int intToStr(int x, char str[], int d);
 void ftoa(float n, char* res, int afterpoint);
 void uart_print(char text[]);
+unsigned int strlen(char *p);
+void tim_base_start_interrupt();
+void init_hal();
+int power(int x, unsigned int y);
 
 /* Private defines -----------------------------------------------------------*/
 #define VCP_TX_Pin GPIO_PIN_2
