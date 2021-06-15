@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-#include "STM32_timer_adc_lib.h"
+#include "timer_adc_voltage_app.h"
 
 #ifdef __cplusplus
 }
