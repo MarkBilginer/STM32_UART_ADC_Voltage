@@ -1,10 +1,14 @@
-/*
- * STM32_timer_adc_lib.c
+/** @file STM32_timer_adc_lib.c
+ *  @brief Library layer for the STM32L4.
  *
- *  Created on: May 26, 2021
- *      Author: mark
- *      bug: when turning potentiometer more it drops from 3.3V to 2.2V.
+ *  This file contains the applications' library abstraction layer, wrapping
+ *  the driver layer functions which are vendor specific. Aims at making
+ *  the code more portable.
+ *
+ *  @author Mark Bilginer (GitHub: MarkBilginer)
+ *  @bug No known bugs.
  */
+
 
 #include "STM32_timer_adc_lib.h"
 
@@ -14,8 +18,13 @@ TIM_HandleTypeDef htim1;
 
 UART_HandleTypeDef huart2;
 
-
-
+/** @brief  Initializes the Hardware Abstraction Layer of STM32.
+ *
+ *  Wrapper function. Calls the vendor specific function HAL_Init().
+ *
+ *  @param None
+ *  @return None
+*/
 void init_hal()
 {
 	HAL_Init();
@@ -40,7 +49,6 @@ unsigned int strlength(char *p)
 	return count;
 }
 
-/* Function to calculate x raised to the power y */
 int power(int x, unsigned int y)
 {
 	if (y == 0)
@@ -56,8 +64,6 @@ void uart_print(char text[])
 	HAL_UART_Transmit(&huart2, (uint8_t*) text, strlength(text), 100);
 }
 
-
-// Reverses a string 'str' of length 'len'
 void reverse(char* str, int len)
 {
 	int i = 0, j = len - 1, temp;
@@ -70,10 +76,6 @@ void reverse(char* str, int len)
 	}
 }
 
-// Converts a given integer x to string str[].
-// d is the number of digits required in the output.
-// If d is more than the number of digits in x,
-// then 0s are added at the beginning.
 int intToStr(int x, char str[], int d)
 {
 	int i = 0;
@@ -82,8 +84,7 @@ int intToStr(int x, char str[], int d)
 		x = x / 10;
 	}
 
-	// If number of digits required is more, then
-	// add 0s at the beginning
+	/* If number of digits required is more, then add 0s at the beginning */
 	while (i < d) {
 		str[i++] = '0';
 	}
@@ -93,25 +94,21 @@ int intToStr(int x, char str[], int d)
 	return i;
 }
 
-// Converts a floating-point/double number to a string.
-void ftoa(float n, char* res, int afterpoint)
+void float_to_str(float n, char* res, int afterpoint)
 {
-	// Extract integer part
+	/* Extract integer part */
 	int ipart = (int)n;
 
-	// Extract floating part
+	/* Extract floating part */
 	float fpart = n - (float)ipart;
 
-	// convert integer part to string
+	/* convert integer part to string */
 	int i = intToStr(ipart, res, 0);
 
-	// check for display option after point
+	/* check for display option after point */
 	if (afterpoint != 0) {
 		res[i] = '.'; // add dot
 
-		// Get the value of fraction part upto given no.
-		// of points after dot. The third parameter
-		// is needed to handle cases like 233.007
 		fpart = fpart * power(10, afterpoint);
 
 		intToStr((int)fpart, res + i + 1, afterpoint);
@@ -119,7 +116,10 @@ void ftoa(float n, char* res, int afterpoint)
 }
 
 
-/** @brief Period elapsed callback in non-blocking mode, toggles LED GREEN and RED
+/** @brief Period elapsed callback in non-blocking mode
+ *
+ *  Polls for ADC value, converts the value to a voltage and prints using UART
+ *  to the console.
  *
  *  @param htim TIM handle
  *  @return None
@@ -140,17 +140,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
 	HAL_ADC_Stop(&hadc1);
 
 	reading_voltage = (adc_reading * sys_voltage)/resolution_adc;
-	ftoa(reading_voltage, reading_voltage_str, 1);
+	float_to_str(reading_voltage, reading_voltage_str, 1);
 
 	uart_print(str1);
 	uart_print(reading_voltage_str);
 	uart_print(str2);
 }
 
-/**
-  * @brief System Clock Configuration
-  * @retval None
-  */
 void config_system_clock(void)
 {
 	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -214,11 +210,6 @@ void config_system_clock(void)
 	HAL_RCCEx_EnableMSIPLLMode();
 }
 
-/**
-  * @brief ADC1 Initialization Function
-  * @param None
-  * @retval None
-  */
 void init_adc1(void)
 {
 	ADC_ChannelConfTypeDef sConfig = {0};
@@ -256,11 +247,6 @@ void init_adc1(void)
 	}
 }
 
-/**
-  * @brief TIM1 Initialization Function
-  * @param None
-  * @retval None
-  */
 void init_timer1(uint32_t prescaler, uint32_t cnt_mode, uint32_t period,
 		uint32_t clk_div, uint32_t rep_cnt, uint32_t reload_preload_enable)
 {
@@ -289,11 +275,6 @@ void init_timer1(uint32_t prescaler, uint32_t cnt_mode, uint32_t period,
 	}
 }
 
-/**
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
 void init_uart(uint32_t baudrate)
 {
 	huart2.Instance = USART2;
@@ -336,10 +317,6 @@ void init_gpio(void)
 	HAL_GPIO_Init(LD3_GPIO_Port, &GPIO_InitStruct);
 }
 
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
 void Error_Handler(void)
 {
 	/* User can add his own implementation to report the HAL error return state */

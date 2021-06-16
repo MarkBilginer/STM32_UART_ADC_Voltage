@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  0002000c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   0001234f  00000000  00000000  0002003c  2**0
+ 12 .debug_info   00012346  00000000  00000000  0002003c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 0000228f  00000000  00000000  0003238b  2**0
+ 13 .debug_abbrev 0000228f  00000000  00000000  00032382  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00001130  00000000  00000000  00034620  2**3
+ 14 .debug_aranges 00001130  00000000  00000000  00034618  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_ranges 00001048  00000000  00000000  00035750  2**3
+ 15 .debug_ranges 00001048  00000000  00000000  00035748  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00021fc7  00000000  00000000  00036798  2**0
+ 16 .debug_macro  00021fd1  00000000  00000000  00036790  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00011f69  00000000  00000000  0005875f  2**0
+ 17 .debug_line   00011f6a  00000000  00000000  00058761  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000d764f  00000000  00000000  0006a6c8  2**0
+ 18 .debug_str    000d7657  00000000  00000000  0006a6cb  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000053  00000000  00000000  00141d17  2**0
+ 19 .comment      00000053  00000000  00000000  00141d22  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000048b0  00000000  00000000  00141d6c  2**2
+ 20 .debug_frame  000048b0  00000000  00000000  00141d78  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -352,10 +352,10 @@ Disassembly of section .text:
  80004c2:	bf00      	nop
 
 080004c4 <init_hal>:
-UART_HandleTypeDef huart2;
-
-
-
+ *
+ *  @param None
+ *  @return None
+*/
 void init_hal()
 {
  80004c4:	b580      	push	{r7, lr}
@@ -423,7 +423,6 @@ unsigned int strlength(char *p)
 
 08000514 <power>:
 
-/* Function to calculate x raised to the power y */
 int power(int x, unsigned int y)
 {
  8000514:	b590      	push	{r4, r7, lr}
@@ -508,8 +507,6 @@ void uart_print(char text[])
 
 080005ac <reverse>:
 
-
-// Reverses a string 'str' of length 'len'
 void reverse(char* str, int len)
 {
  80005ac:	b480      	push	{r7}
@@ -571,10 +568,7 @@ void reverse(char* str, int len)
 	...
 
 0800060c <intToStr>:
-// Converts a given integer x to string str[].
-// d is the number of digits required in the output.
-// If d is more than the number of digits in x,
-// then 0s are added at the beginning.
+
 int intToStr(int x, char str[], int d)
 {
  800060c:	b580      	push	{r7, lr}
@@ -624,8 +618,7 @@ int intToStr(int x, char str[], int d)
  800065e:	d1de      	bne.n	800061e <intToStr+0x12>
 	}
 
-	// If number of digits required is more, then
-	// add 0s at the beginning
+	/* If number of digits required is more, then add 0s at the beginning */
 	while (i < d) {
  8000660:	e007      	b.n	8000672 <intToStr+0x66>
 		str[i++] = '0';
@@ -664,10 +657,9 @@ int intToStr(int x, char str[], int d)
  8000696:	bf00      	nop
  8000698:	66666667 	.word	0x66666667
 
-0800069c <ftoa>:
+0800069c <float_to_str>:
 
-// Converts a floating-point/double number to a string.
-void ftoa(float n, char* res, int afterpoint)
+void float_to_str(float n, char* res, int afterpoint)
 {
  800069c:	b580      	push	{r7, lr}
  800069e:	b088      	sub	sp, #32
@@ -675,14 +667,14 @@ void ftoa(float n, char* res, int afterpoint)
  80006a2:	ed87 0a03 	vstr	s0, [r7, #12]
  80006a6:	60b8      	str	r0, [r7, #8]
  80006a8:	6079      	str	r1, [r7, #4]
-	// Extract integer part
+	/* Extract integer part */
 	int ipart = (int)n;
  80006aa:	edd7 7a03 	vldr	s15, [r7, #12]
  80006ae:	eefd 7ae7 	vcvt.s32.f32	s15, s15
  80006b2:	ee17 3a90 	vmov	r3, s15
  80006b6:	61fb      	str	r3, [r7, #28]
 
-	// Extract floating part
+	/* Extract floating part */
 	float fpart = n - (float)ipart;
  80006b8:	69fb      	ldr	r3, [r7, #28]
  80006ba:	ee07 3a90 	vmov	s15, r3
@@ -691,7 +683,7 @@ void ftoa(float n, char* res, int afterpoint)
  80006c6:	ee77 7a67 	vsub.f32	s15, s14, s15
  80006ca:	edc7 7a06 	vstr	s15, [r7, #24]
 
-	// convert integer part to string
+	/* convert integer part to string */
 	int i = intToStr(ipart, res, 0);
  80006ce:	2200      	movs	r2, #0
  80006d0:	68b9      	ldr	r1, [r7, #8]
@@ -699,11 +691,11 @@ void ftoa(float n, char* res, int afterpoint)
  80006d4:	f7ff ff9a 	bl	800060c <intToStr>
  80006d8:	6178      	str	r0, [r7, #20]
 
-	// check for display option after point
+	/* check for display option after point */
 	if (afterpoint != 0) {
  80006da:	687b      	ldr	r3, [r7, #4]
  80006dc:	2b00      	cmp	r3, #0
- 80006de:	d021      	beq.n	8000724 <ftoa+0x88>
+ 80006de:	d021      	beq.n	8000724 <float_to_str+0x88>
 		res[i] = '.'; // add dot
  80006e0:	697b      	ldr	r3, [r7, #20]
  80006e2:	68ba      	ldr	r2, [r7, #8]
@@ -711,9 +703,6 @@ void ftoa(float n, char* res, int afterpoint)
  80006e6:	222e      	movs	r2, #46	; 0x2e
  80006e8:	701a      	strb	r2, [r3, #0]
 
-		// Get the value of fraction part upto given no.
-		// of points after dot. The third parameter
-		// is needed to handle cases like 233.007
 		fpart = fpart * power(10, afterpoint);
  80006ea:	687b      	ldr	r3, [r7, #4]
  80006ec:	4619      	mov	r1, r3
@@ -800,12 +789,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
  8000786:	ed97 7a0b 	vldr	s14, [r7, #44]	; 0x2c
  800078a:	eec6 7a87 	vdiv.f32	s15, s13, s14
  800078e:	edc7 7a08 	vstr	s15, [r7, #32]
-	ftoa(reading_voltage, reading_voltage_str, 1);
+	float_to_str(reading_voltage, reading_voltage_str, 1);
  8000792:	f107 0318 	add.w	r3, r7, #24
  8000796:	2101      	movs	r1, #1
  8000798:	4618      	mov	r0, r3
  800079a:	ed97 0a08 	vldr	s0, [r7, #32]
- 800079e:	f7ff ff7d 	bl	800069c <ftoa>
+ 800079e:	f7ff ff7d 	bl	800069c <float_to_str>
 
 	uart_print(str1);
  80007a2:	f107 030c 	add.w	r3, r7, #12
@@ -830,10 +819,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
  80007d4:	20000028 	.word	0x20000028
 
 080007d8 <config_system_clock>:
-/**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+
 void config_system_clock(void)
 {
  80007d8:	b580      	push	{r7, lr}
@@ -1012,10 +998,7 @@ void config_system_clock(void)
  80008fc:	40021000 	.word	0x40021000
 
 08000900 <init_adc1>:
-  * @brief ADC1 Initialization Function
-  * @param None
-  * @retval None
-  */
+
 void init_adc1(void)
 {
  8000900:	b580      	push	{r7, lr}
@@ -1144,9 +1127,7 @@ void init_adc1(void)
  80009c4:	14f00020 	.word	0x14f00020
 
 080009c8 <init_timer1>:
-  * @param None
-  * @retval None
-  */
+
 void init_timer1(uint32_t prescaler, uint32_t cnt_mode, uint32_t period,
 		uint32_t clk_div, uint32_t rep_cnt, uint32_t reload_preload_enable)
 {
@@ -1251,10 +1232,7 @@ void init_timer1(uint32_t prescaler, uint32_t cnt_mode, uint32_t period,
  8000a78:	40012c00 	.word	0x40012c00
 
 08000a7c <init_uart>:
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
+
 void init_uart(uint32_t baudrate)
 {
  8000a7c:	b580      	push	{r7, lr}
@@ -1407,10 +1385,7 @@ void init_gpio(void)
  8000b74:	48000400 	.word	0x48000400
 
 08000b78 <Error_Handler>:
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+
 void Error_Handler(void)
 {
  8000b78:	b480      	push	{r7}
@@ -1430,10 +1405,10 @@ __STATIC_FORCEINLINE void __disable_irq(void)
  8000b80:	e7fe      	b.n	8000b80 <Error_Handler+0x8>
 
 08000b82 <main>:
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ *
+ * @todo timer base and interrupt to be stopped.
+ * @return Should not return.
+ */
 int main(void)
 {
  8000b82:	b580      	push	{r7, lr}
@@ -2001,8 +1976,8 @@ void SystemInit(void)
  8000e10:	40021000 	.word	0x40021000
 
 08000e14 <config_timer>:
- *      Author: mark
- */
+
+/* -- Includes -- */
 #include "timer_adc_voltage_app.h"
 
 void config_timer(void)
