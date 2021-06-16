@@ -1,0 +1,3 @@
+timer_adc_voltage_app.c:15:6:config_timer	16	static
+timer_adc_voltage_app.c:21:6:setup_mcu	8	static
+timer_adc_voltage_app.c:37:6:application	56	static
